@@ -17,20 +17,16 @@ const Popup: React.FC<PopupProps> = ({ word, definition, mouseX, mouseY, handleC
     }
     useEffect(() => {
         if (!popupRef.current) return;
-        
         const popupWidth = popupRef.current.clientWidth;
         const popupHeight = popupRef.current.clientHeight;
-        
         const x = Math.min(
             Math.max(0, mouseX),
             window.innerWidth - popupWidth
         );
-        
         const y = Math.min(
             Math.max(0, mouseY),
             window.innerHeight - popupHeight
         );
-        
         setPositionX(x);
         setPositionY(y);
     }, [mouseX, mouseY]);
@@ -43,10 +39,10 @@ const Popup: React.FC<PopupProps> = ({ word, definition, mouseX, mouseY, handleC
             onClick={(e) => e.stopPropagation()}
         >   
             <div  className="w-full bg-black/10 flex items-center justify-between px-4 py-2 border-b border-white/10">
-                <div className="text-white text-sm border-0 font-sans">Rumia</div>
+                <div className="text-white text-sm border-0 font-sans font-bold">Rumia</div>
                 <div className="flex items-center gap-2">
                     {/* <button onClick={handleReDefine}>♲</button> */}
-                    <button onClick={closePopup} className="text-white text-sm border-0">X</button>
+                    <span onClick={closePopup} className="text-white text-sm border-0 select-none cursor-pointer">x</span>
                 </div>
                 
             </div>
