@@ -1,3 +1,18 @@
-# WXT + React
+# Rumia
+## chrome extension that saves time for searching word definition
 
-This template should help get you started developing with React in WXT.
+- Install the repo and run
+```
+    bun install
+```
+
+- Run in dev
+```
+    bun run dev
+```
+
+- Create the extension files
+```
+    bun run build # for chromium
+    bun run build:firefox # for firefox
+```
