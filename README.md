@@ -1,5 +1,5 @@
 # Rumia
-## chrome extension that saves time for searching word definition
+## Chrome extension that uses ai to explain new words with context.
 
 - Install the repo and run
 ```
