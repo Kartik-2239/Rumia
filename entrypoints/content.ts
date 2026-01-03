@@ -4,7 +4,7 @@ import Popup from "../assets/ui.tsx";
 
 export default defineContentScript({
   matches: ["<all_urls>"],
-  main() {
+  main(ctx) {
     let container: HTMLDivElement | null = null;
     let root: ReactDOM.Root | null = null;
     let mouseX = 0;
@@ -23,17 +23,34 @@ export default defineContentScript({
         root = null;
         container = null;
       }
-
+////////////////////////////////////////////////////////
       container = document.createElement("div");
       container.style.position = "fixed";
       container.style.zIndex = "10000";
       document.body.appendChild(container);
+      const shadowRoot = container.attachShadow({ mode: 'open' });
 
-      root = ReactDOM.createRoot(container);
-      root.render(React.createElement(Popup, { word: message.text, definition: "", mouseX: mouseX, mouseY: mouseY, handleClickOutside: () => handleClickOutside(new MouseEvent('mousedown')) }));
+      const style = document.createElement('link');
+      style.rel = 'stylesheet';
+      style.href = 'content-scripts/content.css';
+      shadowRoot.appendChild(style);
+
+      const mountPoint = document.createElement('div');
+      shadowRoot.appendChild(mountPoint);
+
+      root = ReactDOM.createRoot(mountPoint);
+      if (message.error) {
+        root.render(React.createElement(Popup, { word: message.text, definition: message.answer, mouseX: mouseX, mouseY: mouseY, handleClickOutside: () => handleClickOutside(new MouseEvent('mousedown')), error: true }));
+        return;
+      }
+      root.render(React.createElement(Popup, { word: message.text, definition: "", mouseX: mouseX, mouseY: mouseY, handleClickOutside: () => handleClickOutside(new MouseEvent('mousedown')), error: false }));
       browser.runtime.onMessage.addListener((message) => {
         if (root && message.type === 'name-studio-definition') {
-          root.render(React.createElement(Popup, { word: message.text, definition: message.answer, mouseX: mouseX, mouseY: mouseY, handleClickOutside: () => handleClickOutside(new MouseEvent('mousedown')) }));
+          if (message.error) {
+            root.render(React.createElement(Popup, { word: message.text, definition: message.answer, mouseX: mouseX, mouseY: mouseY, handleClickOutside: () => handleClickOutside(new MouseEvent('mousedown')), error: true }));
+            return;
+          }
+          root.render(React.createElement(Popup, { word: message.text, definition: message.answer, mouseX: mouseX, mouseY: mouseY, handleClickOutside: () => handleClickOutside(new MouseEvent('mousedown')), error: false }));
         }
       });
 
@@ -57,3 +74,13 @@ export default defineContentScript({
     });
   },
 });
+
+function createUi(ctx: any) {
+  return createShadowRootUi(ctx, {
+    name: 'Rumia',
+    position: 'overlay',
+    onMount: (ui: any) => {
+      
+    },
+  })
+}

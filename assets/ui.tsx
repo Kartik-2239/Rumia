@@ -10,8 +10,9 @@ type PopupProps = {
   mouseX: number;
   mouseY: number;
   handleClickOutside: () => void;
+  error: boolean;
 };
-const Popup: React.FC<PopupProps> = ({ word, definition, mouseX, mouseY, handleClickOutside }) => {
+const Popup: React.FC<PopupProps> = ({ word, definition, mouseX, mouseY, handleClickOutside, error = false }) => {
     const [isDragging, setIsDragging] = useState(false);
     const [positionX, setPositionX] = useState(mouseX);
     const [positionY, setPositionY] = useState(mouseY);
@@ -97,11 +98,11 @@ const Popup: React.FC<PopupProps> = ({ word, definition, mouseX, mouseY, handleC
             <div onMouseDown={handleMouseDown} className="w-full cursor-move bg-black/10 flex items-center justify-between px-4 py-2 border-b border-white/10">
                 <div className="text-white text-sm border-0 font-sans font-bold">Rumia</div>
                 <div className="flex items-center gap-2">
-                    <span onClick={handleReDefine} className="text-white text-sm border-0 select-none cursor-pointer bg-white/40 rounded-md p-1 w-5 h-5 flex items-center justify-center hover:bg-white/60 transition-all duration-300">
-                        <img src={restart} alt="info" className="w-4 h-4" />
+                    <span onClick={handleReDefine} className="text-white text-sm border-0 select-none cursor-pointer rounded-md p-1 w-5 h-5 flex items-center justify-center">
+                        <img src={restart} alt="info" className="w-4 h-4 filter invert" />
                     </span>
-                    <span onClick={closePopup} className="text-white text-sm border-0 select-none cursor-pointer bg-white/40 rounded-md p-0 w-5 h-5 flex items-center justify-center hover:bg-red-300 transition-all duration-300">
-                        <img src={cross} alt="info" className="w-5 h-5" />
+                    <span onClick={closePopup} className="text-white text-sm border-0 select-none cursor-pointer rounded-md p-0 w-5 h-5 flex items-center justify-center">
+                        <img src={cross} alt="info" className="w-5 h-5 filter invert" />
                     </span>
                 </div>
                 
@@ -110,20 +111,29 @@ const Popup: React.FC<PopupProps> = ({ word, definition, mouseX, mouseY, handleC
                 <div className="flex items-center flex-row gap-2">
                     <div className="text-2xl font-bold no-underline font-sans">{word.charAt(0).toUpperCase() + word.slice(1)}</div>
                     <div className="flex items-center justify-center pt-1 cursor-pointer">
-                        {audioUrl && <audio src={audioUrl} ref={audioRef} />}
-                        <img onClick={handleAudio} src={audio} alt="" className="w-6 h-6" />
+                        {audioUrl ? <audio src={audioUrl} ref={audioRef} /> : <></>}
+                        {audioRef.current ? <img onClick={handleAudio} src={audio} alt="" className="w-6 h-6 filter invert" /> : <></>}
                     </div>
                 </div>
                 
-
-                <div className="flex flex-col gap-0">
-                    <p className="text-white/80 text-sm font-bold font-mono">Definition</p>
-                    <p className="text-white/50 text-sm font-sans">{definition? definition.split('Usage:')[0].split('Definition:')[1] : 'Loading...'}</p>
-                </div>
-                <div className="flex flex-col gap-0">
-                    <p className="text-white/80 text-sm font-bold font-mono">Usage here</p>
-                    <p className="text-white/50 text-sm font-sans">{definition? definition.split('Usage:')[1] : 'Loading...'}</p>
-                </div>
+                {error ? (
+                    <div className="flex flex-col gap-0">
+                        <p className="text-red-500 text-md font-bold font-mono">Error</p>
+                        <p className="text-red-500 text-md font-sans">{definition}</p>
+                    </div>
+                ) : (
+                    <>
+                    <div className="flex flex-col gap-0">
+                        <p className="text-white/80 text-sm font-bold font-mono">Definition</p>
+                        <p className="text-white/50 text-sm font-sans">{definition? definition.split('Usage:')[0].split('Definition:')[1] : 'Loading...'}</p>
+                    </div>
+                    <div className="flex flex-col gap-0">
+                        <p className="text-white/80 text-sm font-bold font-mono">Usage here</p>
+                        <p className="text-white/50 text-sm font-sans">{definition? definition.split('Usage:')[1] : 'Loading...'}</p>
+                    </div>
+                    </>
+                )}
+                
             </div>
         </div>
     );

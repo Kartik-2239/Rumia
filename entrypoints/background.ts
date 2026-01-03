@@ -18,7 +18,7 @@ export default defineBackground(async () => {
       files: ['content-scripts/getSelection.js']
     })
     contextText = res[0].result as string;
-    console.log('contextText', contextText);
+    // console.log('contextText', contextText);
     browser.tabs.query({ active: true, currentWindow: true })
     .then(([tab]) => {
       if (tab?.id) {
@@ -30,7 +30,7 @@ export default defineBackground(async () => {
           });
         }
         const simple_context = contextText?.split('.').filter((val)=>val.includes(info.selectionText as string))[0];
-        
+        // console.log('simple_context', simple_context);
         getDefinition(info.selectionText as string, simple_context, tab);
       }
     });
@@ -51,19 +51,9 @@ export default defineBackground(async () => {
     const groqApiKey = await browser.storage.local.get('groqApiKey').then((result) => {
       return result.groqApiKey as string;
     });
-    const geminiApiKey = await browser.storage.local.get('geminiApiKey').then((result) => {
-      return result.geminiApiKey as string;
-    });
-    var api_key_to_use = '';
-    var base_url = '';
-    var model_to_use = '';
-    if (groqApiKey){
-      api_key_to_use = groqApiKey;
-      base_url = "https://api.groq.com/openai/v1";
-      model_to_use = "openai/gpt-oss-120b";
-    }else{
-      api_key_to_use = '';
-    }
+    const api_key_to_use = groqApiKey;
+    const base_url = "https://api.groq.com/openai/v1";
+    const model_to_use = "openai/gpt-oss-120b";
     const openai = new OpenAI.OpenAI({
       apiKey: api_key_to_use,
       baseURL: base_url,
@@ -101,6 +91,7 @@ export default defineBackground(async () => {
         if (!isStreaming) break;
         if (chunk.type === 'response.output_text.delta') {
           answer = answer + chunk.delta;
+          console.log('answer', answer);
           if (tab?.id) {
             try{
               browser.tabs.sendMessage(tab.id, { 
@@ -131,6 +122,7 @@ export default defineBackground(async () => {
       console.log('Error creating stream', error);
       if (tab?.id) {
         browser.tabs.sendMessage(tab.id, { 
+          error: true,
           type: 'name-studio-definition', 
           text: word,
           answer: 'Error: ' + error.message

@@ -15,12 +15,6 @@ function App() {
   const handleGroqKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
       browser.storage.local.set({ groqApiKey: event.currentTarget.value });
-      checkApiKey().then((res) => {
-        if (!res) {
-          alert('Invalid API key, please try again');
-          browser.storage.local.set({ groqApiKey: '' });
-        }
-      });
     }
   };
   const handleSystemPromptKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
