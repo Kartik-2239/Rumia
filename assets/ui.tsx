@@ -29,13 +29,12 @@ const Popup: React.FC<PopupProps> = ({ word, definition, mouseX, mouseY, handleC
         })
         .catch(error => {
             console.error('Error fetching audio', error);
+            setAudioUrl('');
         });
     }, [word]);
 
     const handleMouseDown = (e: React.MouseEvent) => {
-        console.log('MOUSEDOWN');
         setIsDragging(true);
-        // Calculate where in the element you clicked
         const rect = e.currentTarget.getBoundingClientRect();
         setOffsetX(e.clientX - rect.left);
         setOffsetY(e.clientY - rect.top);
@@ -53,7 +52,6 @@ const Popup: React.FC<PopupProps> = ({ word, definition, mouseX, mouseY, handleC
             setIsDragging(false);
         };
 
-        // Listen on document so it works even when mouse leaves the element
         document.addEventListener('mousemove', handleMouseMove);
         document.addEventListener('mouseup', handleMouseUp);
 
@@ -89,6 +87,8 @@ const Popup: React.FC<PopupProps> = ({ word, definition, mouseX, mouseY, handleC
         audioRef.current.play();
     }
     return (
+        <>
+        <link rel="stylesheet" href="~/assets/tailwind.css" />
         <div
             ref={popupRef}
             className="underline-none w-100 h-60 fixed bg-black/70 border border-white/10 backdrop-blur-md text-white flex flex-col rounded-md shadow-gray-900 shadow-sm"
@@ -112,7 +112,7 @@ const Popup: React.FC<PopupProps> = ({ word, definition, mouseX, mouseY, handleC
                     <div className="text-2xl font-bold no-underline font-sans">{word.charAt(0).toUpperCase() + word.slice(1)}</div>
                     <div className="flex items-center justify-center pt-1 cursor-pointer">
                         {audioUrl ? <audio src={audioUrl} ref={audioRef} /> : <></>}
-                        {audioRef.current ? <img onClick={handleAudio} src={audio} alt="" className="w-6 h-6 filter invert" /> : <></>}
+                        {audioRef.current ? <img onClick={handleAudio} src={audio} alt="" className="w-6 h-6 pb-1 filter invert" /> : <></>}
                     </div>
                 </div>
                 
@@ -136,6 +136,7 @@ const Popup: React.FC<PopupProps> = ({ word, definition, mouseX, mouseY, handleC
                 
             </div>
         </div>
+        </>
     );
 }
 

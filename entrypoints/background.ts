@@ -2,15 +2,15 @@
 export default defineBackground(async () => {
   const OpenAI = await import('openai');
   var contextText = '';
-  // try{
+  try{
     browser.contextMenus.create({
       id: 'Rumia',
       title: 'Define (Rumia)',
       contexts: ['selection'],
     });
-  // }catch(error){
-    // console.error('Error creating context menu', error);
-  // }
+  }catch(error){
+    console.error('Error creating context menu', error);
+  }
   
   browser.contextMenus.onClicked?.addListener(async (info, tab) => {
     const res = await browser.scripting.executeScript({
@@ -84,40 +84,52 @@ export default defineBackground(async () => {
       const stream = await openai.responses.create({
         model: model_to_use,
         input: input,
-        stream: true,
+        // stream: true,
       });
       var answer = '';
-      for await (const chunk of stream) {
-        if (!isStreaming) break;
-        if (chunk.type === 'response.output_text.delta') {
-          answer = answer + chunk.delta;
-          console.log('answer', answer);
-          if (tab?.id) {
-            try{
-              browser.tabs.sendMessage(tab.id, { 
-                type: 'name-studio-definition', 
-                text: word?.toString() || '',
-                answer: answer
-              });
-            }catch(error){
-              console.error('Error sending message', error);
-            }
-          }
-        }
-        if (chunk.type === 'response.output_item.done') {
-          if (tab?.id) {
-            try{
-              browser.tabs.sendMessage(tab.id, { 
-              type: 'name-studio-definition', 
-              text: word,
-              answer: answer
-            });
-            }catch(error){
-              console.error('Error sending message', error);
-            }
-          }
+      if (tab?.id) {
+        try{
+          browser.tabs.sendMessage(tab.id, { 
+            type: 'name-studio-definition', 
+            text: word?.toString() || '',
+            answer: stream.output_text
+          });
+        }catch(error){
+          console.error('Error sending message', error);
         }
       }
+
+      // for await (const chunk of stream) {
+      //   if (!isStreaming) break;
+      //   if (chunk.type === 'response.output_text.delta') {
+      //     answer = answer + chunk.delta;
+      //     console.log('answer', answer);
+      //     if (tab?.id) {
+      //       try{
+      //         browser.tabs.sendMessage(tab.id, { 
+      //           type: 'name-studio-definition', 
+      //           text: word?.toString() || '',
+      //           answer: answer
+      //         });
+      //       }catch(error){
+      //         console.error('Error sending message', error);
+      //       }
+      //     }
+      //   }
+      //   if (chunk.type === 'response.output_item.done') {
+      //     if (tab?.id) {
+      //       try{
+      //         browser.tabs.sendMessage(tab.id, { 
+      //         type: 'name-studio-definition', 
+      //         text: word,
+      //         answer: answer
+      //       });
+      //       }catch(error){
+      //         console.error('Error sending message', error);
+      //       }
+      //     }
+      //   }
+      // }
     }catch(error : any){
       console.log('Error creating stream', error);
       if (tab?.id) {
