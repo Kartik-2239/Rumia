@@ -10,13 +10,14 @@ export default defineContentScript({
     let mouseX = 0;
     let mouseY = 0;
     function mouseMoveListener(event: MouseEvent) {
-      console.log('mouseMoveListener', event);
-        mouseX = event.clientX;
-        mouseY = event.clientY;
+      // console.log('mouseMoveListener', event);
+      mouseX = event.clientX;
+      mouseY = event.clientY;
     }
     document.addEventListener('mousemove', mouseMoveListener);
     
     browser.runtime.onMessage.addListener(async (message) => {
+
       let container: HTMLDivElement | null = null;
       let root: ReactDOM.Root | null = null;
 
@@ -32,35 +33,30 @@ export default defineContentScript({
           }
           currentUi = ui;
           
-          // Create your div
           const mountPoint = document.createElement("div");
           mountPoint.style.position = "fixed";
           mountPoint.style.zIndex = "10000";
+          mountPoint.style.height = "240px";
+          mountPoint.style.width = "400px";
 
           const shadowHost = container.getRootNode() as ShadowRoot;
           const hostElement = shadowHost.host as HTMLElement;
           
           function handleClickOutside(event: MouseEvent) {
-            // if (hostElement){
-              // browser.runtime.sendMessage({
-              //   type: 'stop-streaming'
-              // });
-            // }
             if (hostElement && !hostElement.contains(event.target as Node)) {
               ui.remove();
             }
             document.addEventListener('mousemove', mouseMoveListener);
           }
           
-          // Mount to the shadow root container, not document.body
           container.appendChild(mountPoint);
           
           const root = ReactDOM.createRoot(mountPoint);
           root.render(React.createElement(Popup, { 
             word: message.text, 
             definition: message.answer, 
-            mouseX: mouseX, 
-            mouseY: mouseY, 
+            mouseX: message.positionX>0 ? message.positionX : mouseX, 
+            mouseY: message.positionY>0 ? message.positionY : mouseY,
             handleClickOutside: () => handleClickOutside(new MouseEvent('mousedown')), 
             error: false 
           }));

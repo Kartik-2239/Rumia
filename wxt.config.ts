@@ -8,6 +8,9 @@ export default defineConfig({
     plugins: [tailwindcss()],
   }),
   manifest: {
+    name: 'Rumia ai',
+    description: 'A browser extension that uses ai to explain new words with context.',
+    version: '1.0.0',
     permissions: ['storage', 'contextMenus', 'scripting', 'tabs'],
     host_permissions: ['<all_urls>'],
   },

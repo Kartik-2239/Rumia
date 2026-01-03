@@ -9,7 +9,7 @@ export default defineBackground(async () => {
       contexts: ['selection'],
     });
   }catch(error){
-    console.error('Error creating context menu', error);
+    console.log('Error creating context menu', error);
   }
   
   browser.contextMenus.onClicked?.addListener(async (info, tab) => {
@@ -41,13 +41,13 @@ export default defineBackground(async () => {
         browser.tabs.query({ active: true, currentWindow: true })
         .then(([tab]) => {
           if (tab?.id) {
-            getDefinition(message.word, simple_context, tab, message.previous_definition);
+            getDefinition(message.word, simple_context, tab, message.previous_definition, message.mouseX, message.mouseY);
           }
         });
       }
     });
   });
-  async function getDefinition(word: string, simple_context: string, tab: any, previous_definition?: string) {
+  async function getDefinition(word: string, simple_context: string, tab: any, previous_definition?: string, mouseX?: number, mouseY?: number) {
     const groqApiKey = await browser.storage.local.get('groqApiKey').then((result) => {
       return result.groqApiKey as string;
     });
@@ -81,18 +81,20 @@ export default defineBackground(async () => {
       if (previous_definition) {
         input = input + `\n\nPrevious definition was this and user was not satisfied with it: ${previous_definition}`;
       }
-      const stream = await openai.responses.create({
+      const res = await openai.responses.create({
         model: model_to_use,
         input: input,
         // stream: true,
       });
-      var answer = '';
+      // var answer = '';
       if (tab?.id) {
         try{
           browser.tabs.sendMessage(tab.id, { 
             type: 'name-studio-definition', 
             text: word?.toString() || '',
-            answer: stream.output_text
+            answer: res.output_text,
+            positionX: mouseX || 0,
+            mouseY: mouseY || 0
           });
         }catch(error){
           console.error('Error sending message', error);
