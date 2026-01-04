@@ -25,6 +25,7 @@ const Popup: React.FC<PopupProps> = ({ word, definition, mouseX, mouseY, handleC
 
     const audioRef = useRef<HTMLAudioElement>(null);
     useEffect(() => {
+        if (!word || word === '') return;
         fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + `${word}`)
         .then(response => response.json())
         .then(data => {
@@ -148,10 +149,10 @@ const Popup: React.FC<PopupProps> = ({ word, definition, mouseX, mouseY, handleC
                     </div>
                 </div>
                 
-                {error ? (
+                {error || definition.split('Usage:')[0].split('Definition:')[1] === '' ? (
                     <div className="flex flex-col gap-0">
-                        <p className="text-red-500 text-md font-bold font-mono" style={{ fontSize: '16px' }}>Error</p>
-                        <p className="text-red-500 text-md font-sans" style={{ fontSize: '16px' }}>{definition}</p>
+                        <p className="text-red-400 text-md font-bold font-mono" style={{ fontSize: '16px' }}>Error</p>
+                        <p className="text-red-400 text-md font-sans" style={{ fontSize: '16px' }}>{definition}</p>
                     </div>
                 ) : (
                     <>

@@ -10,7 +10,6 @@ export default defineContentScript({
     let mouseX = 0;
     let mouseY = 0;
     function mouseMoveListener(event: MouseEvent) {
-      // console.log('mouseMoveListener', event);
       mouseX = event.clientX;
       mouseY = event.clientY;
     }
@@ -58,7 +57,7 @@ export default defineContentScript({
             mouseX: message.positionX>0 ? message.positionX : mouseX, 
             mouseY: message.positionY>0 ? message.positionY : mouseY,
             handleClickOutside: () => handleClickOutside(new MouseEvent('mousedown')), 
-            error: false 
+            error: message.error 
           }));
           
           document.addEventListener("mousedown", handleClickOutside);

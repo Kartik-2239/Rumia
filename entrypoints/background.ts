@@ -85,12 +85,11 @@ export default defineBackground(async () => {
       const res = await openai.responses.create({
         model: model_to_use,
         input: input,
-        // stream: true,
       });
-      // var answer = '';
       if (tab?.id) {
         try{
           browser.tabs.sendMessage(tab.id, { 
+            error: false,
             type: 'name-studio-definition', 
             text: word?.toString() || '',
             answer: res.output_text,
@@ -98,43 +97,10 @@ export default defineBackground(async () => {
             mouseY: mouseY || 0
           });
         }catch(error){
-          console.error('Error sending message', error);
+          console.error('Error sending message to content script', error);
         }
       }
-
-      // for await (const chunk of stream) {
-      //   if (!isStreaming) break;
-      //   if (chunk.type === 'response.output_text.delta') {
-      //     answer = answer + chunk.delta;
-      //     console.log('answer', answer);
-      //     if (tab?.id) {
-      //       try{
-      //         browser.tabs.sendMessage(tab.id, { 
-      //           type: 'name-studio-definition', 
-      //           text: word?.toString() || '',
-      //           answer: answer
-      //         });
-      //       }catch(error){
-      //         console.error('Error sending message', error);
-      //       }
-      //     }
-      //   }
-      //   if (chunk.type === 'response.output_item.done') {
-      //     if (tab?.id) {
-      //       try{
-      //         browser.tabs.sendMessage(tab.id, { 
-      //         type: 'name-studio-definition', 
-      //         text: word,
-      //         answer: answer
-      //       });
-      //       }catch(error){
-      //         console.error('Error sending message', error);
-      //       }
-      //     }
-      //   }
-      // }
     }catch(error : any){
-      console.log('Error creating stream', error);
       if (tab?.id) {
         browser.tabs.sendMessage(tab.id, { 
           error: true,
