@@ -22,16 +22,17 @@ export default defineBackground(async () => {
     browser.tabs.query({ active: true, currentWindow: true })
     .then(([tab]) => {
       if (tab?.id) {
+        const word = info.selectionText?.split(' ')[0];
         if (tab?.id) {
           browser.tabs.sendMessage(tab.id, { 
           type: 'name-studio', 
-            text: info.selectionText,
+            text: word,
             answer: ''
           });
         }
         const simple_context = contextText?.split('.').filter((val)=>val.includes(info.selectionText as string))[0];
         // console.log('simple_context', simple_context);
-        getDefinition(info.selectionText as string, simple_context, tab);
+        getDefinition(word as string, simple_context, tab);
       }
     });
 
