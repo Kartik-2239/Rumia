@@ -1,4 +1,8 @@
 # Rumia - Chrome extension that uses ai to explain new words with context.
+
+## Demo Video
+[Demo Video](https://www.youtube.com/watch?v=EWtDGALWK6o)
+
 ## Setup in Dev environment
 
 - Install the repo and run
